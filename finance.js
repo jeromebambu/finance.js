@@ -2,27 +2,30 @@
 //For more information, visit http://financejs.org
 //Copyright 2014 - 2015 Essam Al Joubori, MIT license
 
+//Edited by Melvin
+//Rate to be in decimal form
+
 // Instantiate a Finance class
 var Finance = function() {};
 
 // Present Value (PV)
 Finance.prototype.PV = function (rate, cf1, numOfPeriod) {
   numOfPeriod = typeof numOfPeriod !== 'undefined' ? numOfPeriod : 1;
-  var rate = rate/100, pv;
+  var rate, pv;
   pv = cf1 / Math.pow((1 + rate),numOfPeriod);
   return Math.round(pv * 100) / 100;
 };
 
 // Future Value (FV)
 Finance.prototype.FV = function (rate, cf0, numOfPeriod) {
-  var rate = rate/100, fv;
+  var rate, fv;
   fv = cf0 * Math.pow((1 + rate), numOfPeriod);
   return Math.round(fv * 100) / 100;
 };
 
 // Net Present Value (NPV)
 Finance.prototype.NPV = function (rate) {
-  var rate = rate/100, npv = arguments[1];
+  var rate, npv = arguments[1];
   for (var i = 2; i < arguments.length; i++) {
     npv +=(arguments[i] / Math.pow((1 + rate), i - 1));
   }
@@ -39,6 +42,35 @@ function seekZero(fn) {
     x -= 0.01
   }
   return x + 0.01;
+}
+
+// Future Value of Annuity (FVannuity)
+Finance.prototype.FVannuity = function (rate, numOfPeriod, PMT){
+  var FVannuity
+  FVannuity = (PMT * ((Math.pow((1+rate),(numOfPeriod) ) -1 ) / rate))
+  return Math.round(FVannuity * 100) / 100
+};
+
+// Future Value of Annuity Due (FVannuityDue)
+Finance.prototype.FVannuityDue = function (rate, numOfPeriod, PMT){
+  var FVannuityDue
+  FVannuityDue = ((1+rate) * (PMT * ((Math.pow((1+rate),(numOfPeriod) ) -1 ) / rate)))
+  return Math.round(FVannuityDue * 100) / 100
+};
+
+// Present Value of Annuity (PVannuity)
+Finance.prototype.PVannuity = function (rate,nper, PMT){
+  var PVannuity
+  //PVannuity = (PMT * ((1 - Math.pow((1 + rate), (-nper)))/rate));
+  PVannuity = ((1)*(PMT * ((1 - Math.pow((1 + rate), (-nper)))/rate)));
+  return Math.round(PVannuity * 100) / 100
+}
+
+// Present Value of Annuity Due (PVannuityDue)
+Finance.prototype.PVannuityDue = function (rate,nper, PMT){
+  var PVannuityDue
+  PVannuityDue = ((1+rate)*(PMT * ((1 - Math.pow((1 + rate), (-nper)))/rate)));
+  return Math.round(PVannuityDue * 100) / 100
 }
 
 // Internal Rate of Return (IRR)
@@ -96,7 +128,7 @@ Finance.prototype.ROI = function(cf0, earnings) {
 // Amortization
 Finance.prototype.AM = function (principal, rate, period, yearOrMonth, payAtBeginning) {
   var numerator, denominator, am;
-  var ratePerPeriod = rate / 12 / 100;
+  var ratePerPeriod = rate / 12 ;
 
   // for inputs in years
   if (!yearOrMonth) {
@@ -129,7 +161,7 @@ Finance.prototype.PI = function(rate, cfs){
   for (var i = 2; i < arguments.length; i++) {
     var discountFactor;
     // calculate discount factor
-    discountFactor = 1 / Math.pow((1 + rate/100), (i - 1));
+    discountFactor = 1 / Math.pow((1 + rate), (i - 1));
     totalOfPVs += arguments[i] * discountFactor;
   }
   PI = totalOfPVs/Math.abs(arguments[1]);
@@ -140,7 +172,7 @@ Finance.prototype.PI = function(rate, cfs){
 Finance.prototype.DF = function(rate, numOfPeriods) {
   var dfs = [], discountFactor;
   for (var i = 1; i < numOfPeriods; i++) {
-    discountFactor = 1 / Math.pow((1 + rate/100), (i - 1));
+    discountFactor = 1 / Math.pow((1 + rate), (i - 1));
     roundedDiscountFactor = Math.ceil(discountFactor * 1000)/1000;
     dfs.push(roundedDiscountFactor);
   }
@@ -149,7 +181,7 @@ Finance.prototype.DF = function(rate, numOfPeriods) {
 
 // Compound Interest (CI)
 Finance.prototype.CI = function(rate, numOfCompoundings, principal, numOfPeriods) {
-  var CI = principal * Math.pow((1 + ((rate/100)/ numOfCompoundings)), numOfCompoundings * numOfPeriods);
+  var CI = principal * Math.pow((1 + ((rate)/ numOfCompoundings)), numOfCompoundings * numOfPeriods);
   return Math.round(CI * 100) / 100;
 };
 
@@ -166,7 +198,7 @@ Finance.prototype.LR = function(totalLiabilities, totalDebts, totalIncome) {
 
 // Rule of 72
 Finance.prototype.R72 = function(rate) {
-  return 72 / rate;
+  return 72 / (rate * 100);
 };
 
 // Weighted Average Cost of Capital (WACC)
